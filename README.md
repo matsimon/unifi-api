@@ -124,6 +124,22 @@ Remove a client from the block list.
 
  - `mac` -- the MAC address of the client to unblock.
 
+### `get_quota(self,mac) `
+
+ Return remain upload/download quota for guest
+ 
+### `authorize(self,mac,minutes=800,payload={}):
+  
+ Authorize guest.
+ - `mac` -- the MAC address of the client`
+ - `minutes` -- number of minutes
+ - `payload` -- Array with limits [up=kbps,down=kbps,bytes=MB]
+ 	
+### `unauthorize(self,mac)`
+
+ unauthorize guest
+ - `mac` -- the MAC address of the client 
+ 
 License
 -------
 
