@@ -87,25 +87,25 @@ class Controller:
         """Return a list of all active clients, with significant information about each."""
 
         return self._read(self.url + 'api/stat/sta')
-    
-    def get_quota(self,mac):
-	client = [x for x in self.get_clients() if x.mac == mac]
-	if len(client) > 0:
-	  return max(int(client[0][rx_bytes]),int(client[0][tx_bytes]))
-	else:
-	  return 0
-	
+
+    def get_quota(self, mac):
+        client = [x for x in self.get_clients() if x.mac == mac]
+        if len(client) > 0:
+            return max(int(client[0][rx_bytes]), int(client[0][tx_bytes]))
+        else:
+            return 0
+
     def get_wlan_conf(self):
         """Return a list of configured WLANs with their configuration parameters."""
 
         return self._read(self.url + 'api/list/wlanconf')
 
-    def run(self,command,mgr='api/cmd/stamgr',payload={}):
-        log.debug('_run(%s, %s)', command,mgr)
-        payload.update({'cmd':command})
+    def run(self, command, mgr='api/cmd/stamgr', payload={}):
+        log.debug('_run(%s, %s)', command, mgr)
+        payload.update({'cmd': command})
         params = urllib.urlencode({'json': payload})
         self._read(self.url + mgr, params)
-        
+
     def _mac_cmd(self, target_mac, command, mgr='stamgr'):
         log.debug('_mac_cmd(%s, %s)', target_mac, command)
         params = urllib.urlencode({'json':
@@ -113,20 +113,19 @@ class Controller:
         self._read(self.url + 'api/cmd/' + mgr, params)
 
     #authorize parameters {minutes,up,down,bytes}
-    def _mac_extcmd(self, target_mac, command, mgr='stamgr',payload={}):
+    def _mac_extcmd(self, target_mac, command, mgr='stamgr', payload={}):
         log.debug('_mac_extcmd(%s, %s)', target_mac, command)
         payload.update({'mac': target_mac, 'cmd': command})
-        params = urllib.urlencode({'json':payload})
+        params = urllib.urlencode({'json': payload})
         self._read(self.url + 'api/cmd/' + mgr, params)
-        
 
-    def authorize(self,mac,minutes=800,payload={}):
-	payload.update({'minutes':minutes})
-	self._mac_extcmd(mac,'authorize-guest',payload)
-	
-    def unauthorize(self,mac):
-	self._mac_cmd(mac,'unauthorize-guest')
-      
+    def authorize(self, mac, minutes=800, payload={}):
+        payload.update({'minutes': minutes})
+        self._mac_extcmd(mac, 'authorize-guest', payload)
+
+    def unauthorize(self, mac):
+        self._mac_cmd(mac, 'unauthorize-guest')
+
     def block_client(self, mac):
         """Add a client to the block list.
 
@@ -183,4 +182,3 @@ class Controller:
         for ap in self.get_aps():
             if ap.get('state', 0) == 1 and ap.get('name', None) == name:
                 self.reboot_ap(ap['mac'])
-
