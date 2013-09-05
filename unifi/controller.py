@@ -165,7 +165,7 @@ class Controller:
                  and renders it partially unresponsive for other use.
         """
 
-        js = json.dumps({'cmd':'backup'})
+        js = json.dumps({'cmd': 'backup'})
         params = urllib.urlencode({'json': js})
         answer = self._read(self.url + 'api/cmd/system', params)
 
