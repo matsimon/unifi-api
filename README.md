@@ -126,20 +126,22 @@ Remove a client from the block list.
 
 ### `get_quota(self,mac) `
 
- Return remain upload/download quota for guest
- 
+Return remaining upload/download quota for a guest.
+
 ### `authorize(self,mac,minutes=800,payload={}):
-  
- Authorize guest.
+
+Authorize a guest.
+
  - `mac` -- the MAC address of the client`
  - `minutes` -- number of minutes
  - `payload` -- Array with limits [up=kbps,down=kbps,bytes=MB]
- 	
+
 ### `unauthorize(self,mac)`
 
- unauthorize guest
+Unauthorize a guest.
+
  - `mac` -- the MAC address of the client 
- 
+
 License
 -------
 
