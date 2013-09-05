@@ -157,10 +157,29 @@ class Controller:
                 self.reboot_ap(ap['mac'])
 
     def create_backup(self):
-        """Ask controller to create a backup archive file, response contains the path to the backup file."""
+        """Ask controller to create a backup archive file
+
+        Once done download the file with download_backup().
+
+        Warning: This process puts significant load on the controller
+                 and renders it partially unresponsive for other use.
+        """
 
         js = json.dumps({'cmd':'backup'})
         params = urllib.urlencode({'json': js})
         answer = self._read(self.url + 'api/cmd/system', params)
 
-        return answer[0].get('url')
+        self.backuppath = answer[0].get('url')
+
+    def download_backup(self, targetfile='unifi-backup.unf'):
+        """Download the backup file made by create_backup(), should have a .unf ending for restore."""
+
+        try:
+            download = self.opener.open(self.url + self.backuppath)
+            archive = download.read()
+
+            backupfile = open(targetfile, 'w')
+            backupfile.write(archive)
+            backupfile.close()
+        except AttributeError:
+            print 'Create a backup before downloading one.'
