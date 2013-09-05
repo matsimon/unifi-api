@@ -88,8 +88,11 @@ class Controller:
 
         return self._read(self.url + 'api/stat/sta')
 
-    def get_quota(self, mac):
+    def get_guest_quota(self, mac):
+        """Return the remaining bytes of a guest quota."""
+
         client = [x for x in self.get_clients() if x.mac == mac]
+
         if len(client) > 0:
             return max(int(client[0][rx_bytes]), int(client[0][tx_bytes]))
         else:
@@ -119,11 +122,25 @@ class Controller:
         params = urllib.urlencode({'json': payload})
         self._read(self.url + 'api/cmd/' + mgr, params)
 
-    def authorize(self, mac, minutes=800, payload={}):
+    def authorize_guest(self, mac, minutes=800, payload={}):
+        """Authorize a guest by its MAC-adress.
+
+        Arguments:
+            mac -- the MAC address of the client to authorize.
+
+        """
+
         payload.update({'minutes': minutes})
         self._mac_extcmd(mac, 'authorize-guest', payload)
 
-    def unauthorize(self, mac):
+    def unauthorize_guest(self, mac):
+        """Uneauthorize a guest. by its MAC-adress.
+
+        Arguments:
+            mac -- the MAC address of the client to unauthorize.
+
+        """
+
         self._mac_cmd(mac, 'unauthorize-guest')
 
     def block_client(self, mac):
