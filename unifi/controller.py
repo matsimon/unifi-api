@@ -101,13 +101,6 @@ class Controller:
         params = urllib.urlencode({'json': js})
         return self._read(self.api_url + 'stat/device', params)
 
-    def get_stat(self):
-        """Return a list of all AP:s, with significant information about each."""
-
-        js = json.dumps({'_depth': 2, 'test': None})
-        params = urllib.urlencode({'json': js})
-        return self._read(self.api_url + 'stat', params)
-
     def get_clients(self):
         """Return a list of all active clients, with significant information about each."""
 
