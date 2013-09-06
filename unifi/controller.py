@@ -26,7 +26,7 @@ class Controller:
     nonexistant client) will go unreported.
 
     >>> from unifi.controller import Controller
-    >>> c = Controller('192.168.1.99', 'admin', 'p4ssw0rd')
+    >>> c = Controller('192.168.1.99', 'admin', 'p4ssw0rd', 'latest', 'mysite')
     >>> for ap in c.get_aps():
     ...     print 'AP named %s with MAC %s' % (ap['name'], ap['mac'])
     ...
@@ -78,7 +78,7 @@ class Controller:
     def _construct_api_path(self, version):
         """Helper that returns valid base API path based on version given
 
-           The base API path for the URL is different depending on UniFI server version.
+           The base API path for the URL is different depending on UniFi server version.
            Default returns correct path for latest known working versions.
 
         """
