@@ -53,7 +53,7 @@ class Controller:
         self.password = password
         self.site_id = site_id
         self.url = 'https://' + host + ':8443/'
-        self.api_url = self.url + self._get_api_path(version)
+        self.api_url = self.url + self._construct_api_path(version)
 
         log.debug('Controller for %s', self.url)
 
@@ -75,7 +75,7 @@ class Controller:
         res = self.opener.open(url, params)
         return self._jsondec(res.read())
 
-    def _get_api_path(self, version):
+    def _construct_api_path(self, version):
         """Helper that returns valid base API path based on version given
 
            The base API path for the URL is different depending on UniFI server version.
