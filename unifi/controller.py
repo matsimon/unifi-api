@@ -49,10 +49,10 @@ class Controller:
         """
 
         self.host = host
-        self.site_id = site_id
         self.username = username
         self.password = password
         self.legacy = legacy
+        self.site_id = site_id
         self.url = 'https://' + host + ':8443/'
         log.debug('Controller for %s', self.url)
 
