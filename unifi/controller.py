@@ -36,7 +36,7 @@ class Controller:
 
     """
 
-    def __init__(self, host, username, password, legacy=False, site='default'):
+    def __init__(self, host, username, password, legacy=False, site_id='default'):
         """Create a Controller object.
 
         Arguments:
