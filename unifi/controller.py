@@ -26,7 +26,7 @@ class Controller:
     nonexistant client) will go unreported.
 
     >>> from unifi.controller import Controller
-    >>> c = Controller('192.168.1.99', 'admin', 'p4ssw0rd'
+    >>> c = Controller('192.168.1.99', 'admin', 'p4ssw0rd')
     >>> for ap in c.get_aps():
     ...     print 'AP named %s with MAC %s' % (ap['name'], ap['mac'])
     ...
@@ -36,19 +36,23 @@ class Controller:
 
     """
 
-    def __init__(self, host, username, password):
+    def __init__(self, host, username, password, legacy=False, site='default'):
         """Create a Controller object.
 
         Arguments:
             host     -- the address of the controller host; IP or name
             username -- the username to log in with
             password -- the password to log in with
+            legacy   -- enable or disable legacy API support (1.x/2.x)
+            site_id  -- the sites' ID to manage
 
         """
 
         self.host = host
+        self.site_id = site_id
         self.username = username
         self.password = password
+        self.legacy = legacy
         self.url = 'https://' + host + ':8443/'
         log.debug('Controller for %s', self.url)
 
@@ -81,23 +85,35 @@ class Controller:
 
         js = json.dumps({'_depth': 2, 'test': None})
         params = urllib.urlencode({'json': js})
-        return self._read(self.url + 'api/stat/device', params)
+        if(self.legacy):
+            return self._read(self.url + 'api/stat/device', params)
+        else:
+            return self._read(self.url + 'api/s/' + self.site_id + '/stat/device', params)
 
     def get_clients(self):
         """Return a list of all active clients, with significant information about each."""
 
-        return self._read(self.url + 'api/stat/sta')
+        if(self.legacy):
+            return self._read(self.url + 'api/stat/sta')
+        else:
+            return self._read(self.url + 'api/s/' + self.site_id + '/stat/sta')
 
     def get_wlan_conf(self):
         """Return a list of configured WLANs with their configuration parameters."""
 
-        return self._read(self.url + 'api/list/wlanconf')
+        if(self.legacy):
+            return self._read(self.url + 'api/list/wlanconf')
+        else:
+            return self._read(self.url + 'api/s/' + self.site_id + '/list/wlanconf')
 
     def _mac_cmd(self, target_mac, command, mgr='stamgr'):
         log.debug('_mac_cmd(%s, %s)', target_mac, command)
         params = urllib.urlencode({'json':
             {'mac': target_mac, 'cmd': command}})
-        self._read(self.url + 'api/cmd/' + mgr, params)
+        if(self.legacy):
+            self._read(self.url + 'api/cmd/' + mgr, params)
+        else:
+            self._read(self.url + 'api/s/' + self.site_id + '/cmd/' + mgr, params)
 
     def block_client(self, mac):
         """Add a client to the block list.
@@ -161,6 +177,10 @@ class Controller:
 
         js = json.dumps({'cmd':'backup'})
         params = urllib.urlencode({'json': js})
-        answer = self._read(self.url + 'api/cmd/system', params)
+
+        if(self.legacy):
+            answer = self._read(self.url + 'api/cmd/system', params)
+        else:
+            answer = self._read(self.url + 'api/s/' + self.site_id + '/cmd/system', params)
 
         return answer[0].get('url')
