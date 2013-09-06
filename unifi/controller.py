@@ -36,14 +36,14 @@ class Controller:
 
     """
 
-    def __init__(self, host, username, password, legacy=False, site_id='default'):
+    def __init__(self, host, username, password, version='latest', site_id='default'):
         """Create a Controller object.
 
         Arguments:
             host     -- the address of the controller host; IP or name
             username -- the username to log in with
             password -- the password to log in with
-            legacy   -- enable or disable legacy API support (1.x/2.x)
+            version  -- enable or disable legacy API support (2.x)
             site_id  -- the sites' ID to manage
 
         """
@@ -51,17 +51,11 @@ class Controller:
         self.host = host
         self.username = username
         self.password = password
-        self.legacy = legacy
         self.site_id = site_id
         self.url = 'https://' + host + ':8443/'
+        self.api_url = self.url + self._get_api_path(version)
 
-        if(legacy):
-            self.path = 'api/'
-            log.debug('Controller for %s', self.url)
-
-        else:
-            self.path = 'api/s/' + self.site_id + '/'
-            log.debug('Controller for %s', self.url, 'site ID: ', self.site_id)
+        log.debug('Controller for %s', self.url)
 
         cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -81,6 +75,19 @@ class Controller:
         res = self.opener.open(url, params)
         return self._jsondec(res.read())
 
+    def _get_api_path(self, version):
+        """Helper that returns valid base API path based on version given
+
+           The base API path for the URL is different depending on UniFI server version.
+           Default returns correct path for latest known working versions.
+
+        """
+
+        if(version == '2.x'):
+            return 'api/'
+        else:
+            return 'api/s/' + self.site_id + '/'
+
     def _login(self):
         log.debug('login() as %s', self.username)
         params = urllib.urlencode({'login': 'login',
@@ -93,23 +100,31 @@ class Controller:
         js = json.dumps({'_depth': 2, 'test': None})
         params = urllib.urlencode({'json': js})
 
-        return self._read(self.url + self.path + 'stat/device', params)
+        return self._read(self.api_url + 'stat/device', params)
+
+    def get_stat(self):
+        """Return a list of all AP:s, with significant information about each."""
+
+        js = json.dumps({'_depth': 2, 'test': None})
+        params = urllib.urlencode({'json': js})
+
+        return self._read(self.api_url + 'stat', params)
 
     def get_clients(self):
         """Return a list of all active clients, with significant information about each."""
 
-        return self._read(self.url + self.path + 'stat/sta')
+        return self._read(self.api_url + 'stat/sta')
 
     def get_wlan_conf(self):
         """Return a list of configured WLANs with their configuration parameters."""
 
-        return self._read(self.url + self.path + 'list/wlanconf')
+        return self._read(self.api_url + 'list/wlanconf')
 
     def _mac_cmd(self, target_mac, command, mgr='stamgr'):
         log.debug('_mac_cmd(%s, %s)', target_mac, command)
         params = urllib.urlencode({'json':
             {'mac': target_mac, 'cmd': command}})
-        self._read(self.url + self.path + 'cmd/' + mgr, params)
+        self._read(self.api_url + 'cmd/' + mgr, params)
 
     def block_client(self, mac):
         """Add a client to the block list.
@@ -174,6 +189,6 @@ class Controller:
         js = json.dumps({'cmd':'backup'})
         params = urllib.urlencode({'json': js})
 
-        answer = self._read(self.url + self.path +'cmd/system', params)
+        answer = self._read(self.api_url +'cmd/system', params)
 
         return answer[0].get('url')
