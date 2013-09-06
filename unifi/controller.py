@@ -54,7 +54,14 @@ class Controller:
         self.legacy = legacy
         self.site_id = site_id
         self.url = 'https://' + host + ':8443/'
-        log.debug('Controller for %s', self.url)
+
+        if(legacy):
+            self.path = 'api/'
+            log.debug('Controller for %s', self.url)
+
+        else:
+            self.path = 'api/s/' + self.site_id + '/'
+            log.debug('Controller for %s', self.url, 'site ID: ', self.site_id)
 
         cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -85,35 +92,24 @@ class Controller:
 
         js = json.dumps({'_depth': 2, 'test': None})
         params = urllib.urlencode({'json': js})
-        if(self.legacy):
-            return self._read(self.url + 'api/stat/device', params)
-        else:
-            return self._read(self.url + 'api/s/' + self.site_id + '/stat/device', params)
+
+        return self._read(self.url + self.path + 'stat/device', params)
 
     def get_clients(self):
         """Return a list of all active clients, with significant information about each."""
 
-        if(self.legacy):
-            return self._read(self.url + 'api/stat/sta')
-        else:
-            return self._read(self.url + 'api/s/' + self.site_id + '/stat/sta')
+        return self._read(self.url + self.path + 'stat/sta')
 
     def get_wlan_conf(self):
         """Return a list of configured WLANs with their configuration parameters."""
 
-        if(self.legacy):
-            return self._read(self.url + 'api/list/wlanconf')
-        else:
-            return self._read(self.url + 'api/s/' + self.site_id + '/list/wlanconf')
+        return self._read(self.url + self.path + 'list/wlanconf')
 
     def _mac_cmd(self, target_mac, command, mgr='stamgr'):
         log.debug('_mac_cmd(%s, %s)', target_mac, command)
         params = urllib.urlencode({'json':
             {'mac': target_mac, 'cmd': command}})
-        if(self.legacy):
-            self._read(self.url + 'api/cmd/' + mgr, params)
-        else:
-            self._read(self.url + 'api/s/' + self.site_id + '/cmd/' + mgr, params)
+        self._read(self.url + self.path + 'cmd/' + mgr, params)
 
     def block_client(self, mac):
         """Add a client to the block list.
@@ -178,9 +174,6 @@ class Controller:
         js = json.dumps({'cmd':'backup'})
         params = urllib.urlencode({'json': js})
 
-        if(self.legacy):
-            answer = self._read(self.url + 'api/cmd/system', params)
-        else:
-            answer = self._read(self.url + 'api/s/' + self.site_id + '/cmd/system', params)
+        answer = self._read(self.url + self.path +'cmd/system', params)
 
         return answer[0].get('url')
