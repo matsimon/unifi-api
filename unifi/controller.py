@@ -99,7 +99,6 @@ class Controller:
 
         js = json.dumps({'_depth': 2, 'test': None})
         params = urllib.urlencode({'json': js})
-
         return self._read(self.api_url + 'stat/device', params)
 
     def get_stat(self):
@@ -107,7 +106,6 @@ class Controller:
 
         js = json.dumps({'_depth': 2, 'test': None})
         params = urllib.urlencode({'json': js})
-
         return self._read(self.api_url + 'stat', params)
 
     def get_clients(self):
@@ -188,7 +186,6 @@ class Controller:
 
         js = json.dumps({'cmd':'backup'})
         params = urllib.urlencode({'json': js})
-
         answer = self._read(self.api_url +'cmd/system', params)
 
         return answer[0].get('url')
