@@ -98,6 +98,14 @@ class Controller:
         else:
             return self._read(self.url + 'api/s/' + self.site_id + '/stat/sta')
 
+    def get_users(self):
+        """Return a list of all known clients, with significant information about each."""
+        return self._read(self.url + 'api/s/' + self.site_id + '/list/user')
+
+    def get_user_groups(self):
+        """Return a list of user groups, with significant information about each."""
+        return self._read(self.url + 'api/s/' + self.site_id + '/list/usergroup')
+
     def get_wlan_conf(self):
         """Return a list of configured WLANs with their configuration parameters."""
 
